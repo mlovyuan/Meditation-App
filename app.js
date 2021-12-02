@@ -1,6 +1,5 @@
 const app = () => {
   const video = document.querySelector(".vid- container video");
-  const sounds = document.querySelectorAll(".sound-picker button");
   const outline = document.querySelector(".moving-outline circle");
   const outlineLength = outline.getTotalLength();
 
@@ -9,10 +8,6 @@ const app = () => {
 
   const play = document.querySelector(".play");
   const song = document.querySelector(".song");
-  play.addEventListener("click", () => {
-    checkPlaying(song);
-  });
-
   const checkPlaying = (playedSong) => {
     if (playedSong.pause) {
       song.play();
@@ -24,11 +19,23 @@ const app = () => {
       play.src = "./svg/play.svg";
     }
   };
+  play.addEventListener("click", () => {
+    checkPlaying(song);
+  });
+
+  const sounds = document.querySelectorAll(".sound-picker button");
+  sounds.forEach((sound) => {
+    sound.addEventListener("click", function () {
+      song.src = this.getAttribute("data-sound");
+      video.src = this.getAttribute("data-video");
+      checkPlaying(song);
+    });
+  });
 
   let fakeDuration = 600;
   const timeSelect = document.querySelectorAll(".time select button");
   timeSelect.forEach((timeButton) => {
-    timeButton.addEventListener("click", () => {
+    timeButton.addEventListener("click", function () {
       fakeDuration = this.getAttribute("data-time");
       timeDisplay.textContent = `${Math.floor(fakeDuration / 60)}:${Math.floor(
         fakeDuration % 60
@@ -46,6 +53,13 @@ const app = () => {
     let progress = outlineLength - (currentTime / fakeDuration) * outlineLength;
     outline.style.strokeDashoffset = progress;
     timeDisplay.textContent = `${minutes}:${seconds}`;
+
+    if (currentTime > fakeDuration) {
+      song.pause();
+      song.currentTime = 0;
+      play.src = "./svg/play.svg";
+      video.pause();
+    }
   };
 };
 
